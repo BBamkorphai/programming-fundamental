@@ -23,7 +23,7 @@ int main(){
             }
         }
     }
-	else if(month=1)
+	else if(month==1)
 	{
         countday += 0;
     }

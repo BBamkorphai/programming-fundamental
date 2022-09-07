@@ -1,5 +1,4 @@
 #include <stdio.h>
-//0022 : star
 int main()
 {
     int n,i,j;

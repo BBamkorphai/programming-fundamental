@@ -21,7 +21,7 @@ int main()
             }
         }
     }
-	else if ( month=1 )
+	else if ( month == 1 )
 	{
         daycount += 0;
     }

@@ -1,10 +1,11 @@
-#include<stdio.h>
-#include<math.h>
+# include <stdio.h>
 int main()
 {
-	int num;
-	scanf("%d", &num);
-	printf("your number is %d\n", num);
-	
-	return 0;
+	int x;
+	for(x=1;x<10;x++)
+	{
+		printf("x");
+		Sleep(1000);
+	}
 }
+
