@@ -1,6 +1,9 @@
 #include<stdio.h>
 #include<windows.h>
 #include<conio.h>
+#include <time.h>
+#include <thread>
+#include <mutex>
 void draw_ship (int x,int y)
 {
 	COORD c = { x, y };
@@ -12,6 +15,15 @@ void erase_ship(int x,int y)
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
 	printf("       ");
+}
+char cursor(int x, int y)
+{
+	HANDLE hStd = GetStdHandle(STD_OUTPUT_HANDLE);
+	char buf[2]; COORD c = {x,y}; DWORD num_read;
+	if(!ReadConsoleOutputCharacter(hStd,(LPTSTR)buf,1,c,(LPDWORD)&num_read) )
+	return '\0';
+	else
+	return buf[0];
 }
 void setcursor(int visible)
 {
@@ -30,7 +42,7 @@ void draw_bullet(int x, int y)
 {
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
-	printf("   *  ");
+	printf("   |  ");
 }
 void erase_bullet(int x, int y)
 {
@@ -147,6 +159,8 @@ int main(){
 			// firer !!
 			if(ch == ' ' && bullet_array[(i * 2)] == 999 && bullet_array[(i * 2) + 1] == 999)
 			{
+				std::thread q(Beep, 700, 500);
+ 				q.detach();
 				bullet_array[(i * 2)] = x;
 				bullet_array[(i * 2) + 1] = y - 1;
 				i++ ;
