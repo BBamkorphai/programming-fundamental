@@ -1,0 +1,5 @@
+name:s level:5 score:1
+name:i level:5 score:6
+name:o level:7 score:9
+name:j level:2 score:6
+name:f level:5 score:7

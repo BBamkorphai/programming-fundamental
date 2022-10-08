@@ -1,22 +1,30 @@
 #include <stdio.h>
 #include <windows.h>
 #include <conio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <thread>
-#include <mutex>
-void draw_ship (int x,int y)
+
+void setcolor(int fg,int bg)
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, bg*16+fg);
+}
+void draw_ship (short x,short y)
 {
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
+	setcolor(4,2);
 	printf(" <-0-> ");
 }
-void erase_ship(int x,int y)
+void erase_ship(short x,short y)
 {
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
 	printf("       ");
 }
-char cursor(int x, int y)
+char cursor(short x, short y)
 {
 	HANDLE hStd = GetStdHandle(STD_OUTPUT_HANDLE);
 	char buf[2]; COORD c = {x,y}; DWORD num_read;
@@ -33,30 +41,54 @@ void setcursor(int visible)
 	lpCursor.dwSize = 20;
 	SetConsoleCursorInfo(console,&lpCursor);
 }	
-void setcolor(int fg,int bg)
-{
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsole, bg*16+fg);
-}
-void draw_bullet(int x, int y)
+void draw_bullet(short x, short y)
 {
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
-	printf("   |  ");
+	printf("|");
 }
-void erase_bullet(int x, int y)
+void erase_bullet(short x, short y)
 {
+	setcolor(2, 0);
 	COORD c = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
-	printf("      ");
+	printf(" ");
+}
+void    draw_star(short x, short y)
+{
+    setcolor(7, 0);
+    COORD c = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
+    printf("*");
+}
+void    show_score(short x, short y, int score)
+{
+    COORD c = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE) , c);
+    printf("score: %d", score);
 }
 int main(){	
 	char ch=' ';
-	int x=40 ,y=15, checker = 0, i = 0, n = 0;
+	int x=40 ,y=15, checker = 0, i = 0, n = 0, j = 0, star_X_line, star_Y_line, score = 0;
 	int bullet_array[10] = { 999, 999, 999, 999, 999, 999, 999, 999, 999, 999 };
-	setcolor(4,2);
-	draw_ship(x,y);
+	srand(time(NULL));
 	setcursor(0);
+	draw_ship(x,y);
+	
+	// random star
+	while (j < 8)
+    {
+        star_X_line = 10 + (rand() % 61);
+        star_Y_line = 2 + (rand() % 4);
+        if(cursor(star_X_line, star_Y_line) != '*')
+        {
+            draw_star(star_X_line, star_Y_line);
+            j++;
+        }
+        else
+            j = j;
+    }
+	
 	do {
 
 		if (i == 5)
@@ -77,13 +109,31 @@ int main(){
 				bullet_array[(n*2)] = 999;
 				bullet_array[(n*2) + 1] = 999;
 			}
-			if(bullet_array[(n*2)] != 999 || bullet_array[(n*2) + 1] != 999)
-			{
-				setcolor(0,0);
-				erase_bullet(bullet_array[(n*2)], bullet_array[(n*2) + 1]);
-				setcolor(4,0);
-				draw_bullet(bullet_array[(n*2)], --bullet_array[(n*2) + 1]);
-			}
+			if(bullet_array[(n * 2)] != 999 || bullet_array[(n * 2) + 1] != 999)
+            {
+                erase_bullet(bullet_array[(n * 2)], bullet_array[(n * 2) + 1]);
+                if(cursor(bullet_array[(n * 2)], bullet_array[(n * 2) + 1] - 1) == '*')
+                // engaged star
+                {
+                	score += 1000;
+                	show_score(2, 21, score);
+                    erase_bullet(bullet_array[(n * 2)], bullet_array[(n * 2) + 1] - 1);
+                    std::thread q(Beep, 700, 500);
+                    q.detach();
+                    do
+                    {        
+                        star_X_line = 10 + (rand() % 61);
+                        star_Y_line = 2 + (rand() % 4);
+                    } while (cursor(star_X_line, star_Y_line) == '*');
+                    draw_star(star_X_line, star_Y_line);
+                    bullet_array[(n * 2)] = 999;
+                    bullet_array[(n * 2) + 1] = 999;
+                }
+                else
+                {
+                    draw_bullet(bullet_array[(n * 2)], --bullet_array[(n * 2) + 1]);
+                }
+            }
 			n++;
 		}
 		if (checker == 4)
@@ -159,9 +209,9 @@ int main(){
 			// firer !!
 			if(ch == ' ' && bullet_array[(i * 2)] == 999 && bullet_array[(i * 2) + 1] == 999)
 			{
-				std::thread q(Beep, 700, 500);
+				std::thread q(Beep, 650, 500);
  				q.detach();
-				bullet_array[(i * 2)] = x;
+				bullet_array[(i * 2)] = x + 3;
 				bullet_array[(i * 2) + 1] = y - 1;
 				i++ ;
 			}
@@ -172,4 +222,5 @@ int main(){
 	while (ch!='x');
 	return (0);
 }
+
 

@@ -11,7 +11,7 @@ int	abs(int nbr)
 int main()
 {
 	//long long int x_point[1000], y_point[1000], distance[1000]; 
-	int x_point[1000], y_point[1000], distance[1000]; 
+	int x_point[1000], y_point[1000], distance[1000][2]; 
 	double test;
 	double averagepoint_x = 0, averagepoint_y = 0; 
 	int n,j;
@@ -52,29 +52,29 @@ int main()
 		printf("distance %d is %f\n",i,test);
 		int a = (int) test ;	
 		printf("distance %d is %d\n",i,a);
-		distance[i] = a;		
+		distance[i][0] = a;	
+		distance[i][1] = i;		
 	}
-	printf("+++++++++++\n");
-	for (i=0 ; i<n ; i++)
-	{
-		printf("distance %d is %d\n",i,distance[i]);
-	}
-	for ( i = 0 ; i < n ; i++ )
-	{
-		value = distance[i];
-		for ( j=i-1 ; j>= 0 ; j--)
-		{
-			if(distance[j]<= value)break;
-			{
-				distance[j+1]=distance[j];
+	printf("+++++++++++\n");	
+	//int j;
+	for (i= 0; i< n; ++i) {
+		for (j= 0; j< n; ++j) {
+			if (distance[i][0] > distance[j][0]) {
+				int hold[2] = {distance[i][0], distance[i][1]};
+				
+				distance[i][0] = distance[j][0];
+				distance[i][1] = distance[j][1];
+				
+				distance[j][0] = hold[0];
+				distance[j][1] = hold[1];
 			}
 		}
-		distance[j+1]=value;
 	}
-	printf("+++++++++++\n");
+	
+	
 	for (i=0 ; i<n ; i++)
 	{
-		printf("distance %d is %d\n",i,distance[i]);
+		printf("distance %d is %d\n",i,distance[i][0]);
 	}
 	return 0;
 	

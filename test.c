@@ -1,157 +1,81 @@
 #include <stdio.h>
 #include <windows.h>
-#include <conio.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include <time.h>
+#define scount 80
+#define screen_x 80
+#define screen_y 25
+int x_pin, y_pin, x, y;
+HANDLE wHnd;
+CHAR_INFO consoleBuffer[screen_x * screen_y];
+COORD bufferSize = { screen_x,screen_y };
+COORD characterPos = { 0,0 };
+SMALL_RECT windowSize = { 0,0,screen_x-1,screen_y-1 };
+COORD star[scount];
+int setConsole(int x, int y)
+{
+	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
+	SetConsoleScreenBufferSize(wHnd, bufferSize);
+	return 0;
+}
+void clear_buffer()
+{
+	for (y = 0; y < screen_y; ++y) 
+	{
+		for (x = 0; x < screen_x; ++x) 
+		{
+			consoleBuffer[x + screen_x * y].Char.AsciiChar = ' ';
+			consoleBuffer[x + screen_x * y].Attributes = 7;
+		}
+	}
+}
+void fill_buffer_to_console()
+{
+	WriteConsoleOutputA(wHnd, consoleBuffer, bufferSize, characterPos,&windowSize);
+}
+void init_star()
+{
+	x_pin = (rand()%79);
+	y_pin = (rand()%24);
+}
+void star_fall()
+{
+	int i;
+	for (i = 0; i < scount; i++) 
+	{
+		if (star[i].Y >= screen_y-1) 
+		{
+			star[i].x =  (rand() % screen_x) ;
+			star[i].y =  1 ;
+		}
+		else 
+		{
+			star[i].X =  star[i],
+			star[i].Y+1 ;
+		}
+	}
+}
 
-void    gotoxy(int x, int y)
+void fill_star_to_buffer()
 {
-    COORD c = {x, y};
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+	consoleBuffer[x_pin + screen_x * y_pin].Char.AsciiChar = '*';
+	consoleBuffer[x_pin + screen_x * y_pin].Attributes = 0;
 }
-void    setcursor(bool visible)
+int main()
 {
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_CURSOR_INFO lpcursor;
-    lpcursor.bVisible = visible;
-    lpcursor.dwSize = 20;
-    SetConsoleCursorInfo(console, &lpcursor);
-}
-void    setcolor(int fg, int bg)
-{
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, bg * 16 + fg);
-}
-void    draw_bullet(int x, int y)
-{
-    setcolor(7, 0);
-    gotoxy(x, y);
-    printf("^");
-}
-
-void    erase_bullet(int x, int y)
-{
-    setcolor(7, 0);
-    gotoxy(x, y);
-    printf(" ");
-}
-
-void    erase_ship(int x, int y)
-{
-    setcolor(7, 0);
-    gotoxy(x, y);
-    printf("     ");
-}
-
-void    draw_ship(int x, int y)
-{
-    setcolor(2, 4);
-    gotoxy(x, y);
-    printf("<-0->");
-}
-
-int main(void)
-{
-    char    ch = ' ';
-    int     x = 38, y = 20;
-    int     flag = 0;
-    int     i = 0, n = 0;
-    int     bullet[10] = {999, 999, 999, 999, 999, 999, 999, 999, 999, 999};
-
-    setcursor(0);
-    draw_ship(x, y);
-    do
-    {
-        if(i == 5)
-            i = 0;
-        if(n == 5)
-            n = 0;
-        while (n < 5)
-        {
-            if(bullet[(n * 2) + 1] <= 0)
-            {
-                erase_bullet(bullet[(n * 2)], bullet[(n * 2) + 1]);
-                bullet[(n * 2)] = 999;
-                bullet[(n * 2) + 1] = 999;
-            }
-            if(bullet[(n * 2)] != 999 || bullet[(n * 2) + 1] != 999)
-            {
-                erase_bullet(bullet[(n * 2)], bullet[(n * 2) + 1]);
-                draw_bullet(bullet[(n * 2)], --bullet[(n * 2) + 1]);
-            }
-            n++;
-        }
-        if(flag == 1)
-        {
-            erase_ship(x, y);
-            draw_ship(--x, y);
-        }
-        if(flag == 2)
-        {
-            erase_ship(x, y);
-            draw_ship(++x, y);
-        }
-        if(x >= 80 || x <= 0 || y >= 80 || y <= 0)
-        {
-            flag = 0;
-        }
-        if(_kbhit())
-        {
-            ch = _getch();
-            /*if(ch == 'a' && x != 0)
-            {
-                erase_ship(x, y);
-                draw_ship(--x, y);
-            }
-            if(ch == 's' && y != 80)
-            {
-                erase_ship(x, y);
-                draw_ship(x, ++y);
-            }
-            if(ch == 'w' && y != 0)
-            {
-                erase_ship(x, y);
-                draw_ship(x, --y);
-            }
-            if(ch == 'd' && x != 80)
-            {
-                erase_ship(x, y);
-                draw_ship(++x, y);
-            }*/
-            if(ch == 's' || x >= 80 || x <= 0 || y >= 80 || y <= 0)
-            {
-                flag = 0;
-            }
-            if(ch == 'a' && flag == 0)
-            {
-                flag = 1;
-            }
-            /*if(flag == 1)
-            {
-                erase_ship(x, y);
-                draw_ship(--x, y);
-            }*/
-            if(ch == 'd' && flag == 0)
-            {
-                flag = 2;
-            }
-            /*if(flag == 2)
-            {
-                erase_ship(x, y);
-                draw_ship(++x, y);
-            }*/
-            if(ch == ' ' && bullet[(i * 2)] == 999 && bullet[(i * 2) + 1] == 999)
-            {
-                bullet[(i * 2)] = x + 2;
-                bullet[(i * 2) + 1] = y - 1;
-                i++;
-            }
-            fflush(stdin);
-        }
-        Sleep(100);
-    }
-    while (ch != 'x');
-    setcolor(7, 0);
-    setcursor(1);
-    return (0);
+	int i;
+	srand(time(NULL));
+	setConsole(screen_x, screen_y);
+	init_star();
+	i = 0;
+	while (i < 20)
+	{
+		star_fall();
+		clear_buffer();
+		fill_star_to_buffer();
+		fill_buffer_to_console();
+		Sleep(200);
+		i++;
+	}
+	return 0;
 }
