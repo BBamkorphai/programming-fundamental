@@ -1,13 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-int	abs(int nbr)
-{
-	if(nbr < 0)
-		return (-nbr);
-	else 
-		return (nbr);
-}
 int main()
 {
 	//long long int x_point[1000], y_point[1000], distance[1000]; 
@@ -23,6 +16,10 @@ int main()
 	double chosen[8];
 	int i,a,b,c;
 	int value;
+	int area;
+	int sum_all;
+	double answer;
+	double last_answer;
 	scanf("%d", &n);
 	printf("n is %d\n", n);
 	// input
@@ -33,7 +30,7 @@ int main()
 	}
 	for (i=0 ; i<n ; i++)
 	{
-		printf("%d %d", x_point[i], y_point[i]);
+		printf("point %d is (%d,%d)\n", i,x_point[i], y_point[i]);
 	}
 	// find an average x and y
 	for (i=0 ; i<n ; i++)
@@ -74,8 +71,22 @@ int main()
 	
 	for (i=0 ; i<n ; i++)
 	{
-		printf("distance %d is %d\n",i,distance[i][0]);
+		printf("distance[1] %d is %d\n",i,distance[i][0]);
+		printf("distance[2] %d is %d\n",i,distance[i][1]);
 	}
+	
+	//area
+	a = distance[0][1];
+	b = distance[1][1];
+	c = distance[2][1];
+	sum_all = (x_point[a]*y_point[b]) + (x_point[b]*y_point[c]) + (x_point[c]*y_point[a]) - (y_point[a]*x_point[b]) - (y_point[b]*x_point[c]) - (y_point[c]*x_point[a]);
+	printf("sumall is %d\n",sum_all);
+	
+	area = abs(sum_all);
+	printf("area is %d\n", area);
+	//answer = (double) area ;
+	//printf("answer is %f\n", answer);
+	printf("last_answer is %f\n",area/2.0);
 	return 0;
 	
 }
