@@ -11,6 +11,9 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations['idel'][self.frame_index]
         self.rect = self.image.get_rect(topleft = pos)
 
+        # player_pos
+        self.player_pos = pos
+
         #health bar
         self.current_health = 200
         self.target_health = 500
@@ -40,6 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.on_left = False
         self.on_right = False
 
+
     def get_damage(self,amount):
         if self.target_health > 0:
             self.target_health -= amount
@@ -64,14 +68,12 @@ class Player(pygame.sprite.Sprite):
             self.current_health -= self.health_change_speed 
             transition_width = int((self.target_health - self.current_health) / self.health_ratio)
             transition_color = (255,255,0)
-            print("damaged")
 
 
         if self.current_health < self.target_health:
             self.current_health += self.health_change_speed
             transition_width = int((self.target_health - self.current_health) / self.health_ratio)
             transition_color = (0,255,0)
-            print("heal")
 
 
         health_bar_width = int(self.current_health / self.health_ratio)
@@ -182,6 +184,5 @@ class Player(pygame.sprite.Sprite):
         self.get_status()
         self.animate()
         self.run_dust_animation()
-        #self.basic_health()
         self.advanced_health()
 

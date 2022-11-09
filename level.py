@@ -3,6 +3,8 @@ from tiles import Tile
 from settings import tile_size, screen_width, screen_height
 from player import Player
 from particles import ParticleEffect
+from enemy import Enemy
+
 
 class Level:
     def __init__(self,level_data,surface): 
@@ -44,6 +46,7 @@ class Level:
     def setup_level(self,layout):
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.enemy = pygame.sprite.GroupSingle()
 
         for row_index,row in enumerate(layout):
             for col_index,cell in enumerate(row):
@@ -88,22 +91,31 @@ class Level:
                 if cell == 'P':                 
                     player_sprite = Player((x,y),self.display_surface,self.create_jump_particles)
                     self.player.add(player_sprite)
+                if cell == 'E':                 
+                    enemy_sprite = Enemy((x,y),self.display_surface)
+                    self.enemy.add(enemy_sprite)
+                    print(str((x,y)))
 
 
     def scroll_x(self):
         player = self.player.sprite
+        enemy = self.enemy.sprite
         player_x = player.rect.centerx
         direction_x = player.direction.x
 
         if player_x < screen_width / 4 and direction_x < 0:
             self.world_shift_x = 6
             player.speed = 0
+            enemy.speed = 4
+            
         elif player_x > screen_width - (screen_width / 4) and direction_x > 0:
             self.world_shift_x = -6
             player.speed = 0
+            enemy.speed = 4
         else:
             self.world_shift_x = 0
             player.speed = 4
+            enemy.speed = 4
 
     def horizontal_movement_collision(self):
         player = self.player.sprite
@@ -144,7 +156,47 @@ class Level:
         if player.on_ceiling and player.direction.y > 0.1:
             player.on_ceiling = False
 
+    def enemy_horizontal_movement_collision(self):
+        enemy = self.enemy.sprite
+        enemy.rect.x += enemy.direction.x * enemy.speed
 
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(enemy.rect):
+                if enemy.direction.x < 0:
+                    enemy.rect.left = sprite.rect.right
+                    enemy.facing_right = True
+                    enemy.on_left = True
+                    self.current_x = enemy.rect.left
+                elif enemy.direction.x > 0:
+                    enemy.rect.right = sprite.rect.left
+                    enemy.facing_right = False
+                    enemy.on_right = True
+                    self.current_x = enemy.rect.right
+
+        if enemy.on_left and (enemy.rect.left < self.current_x or enemy.direction.x >= 0):
+            enemy.on_left = False
+        if enemy.on_right and (enemy.rect.right > self.current_x or enemy.direction.x <= 0):
+            enemy.on_right = False
+
+    def enemy_vertical_movement_collision(self):
+        enemy = self.enemy.sprite
+        enemy.apply_gravity()
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(enemy.rect):
+                if enemy.direction.y > 0:
+                    enemy.rect.bottom = sprite.rect.top
+                    enemy.direction.y = 0
+                    enemy.on_ground = True
+                elif enemy.direction.y < 0:
+                    enemy.rect.top = sprite.rect.bottom
+                    enemy.direction.y = 0
+                    enemy.on_ceiling = True
+
+        if enemy.on_ground and enemy.direction.y < 0 or enemy.direction.y > 1:
+            enemy.on_ground = False
+        if enemy.on_ceiling and enemy.direction.y > 0.1:
+            enemy.on_ceiling = False
+    
 
     def run(self):
         # dust particles 
@@ -162,7 +214,17 @@ class Level:
         self.horizontal_movement_collision()
         self.get_player_on_ground()
         self.vertical_movement_collision()
+        
         self.player.update()
         self.create_landing_dust()
         self.player.draw(self.display_surface)
+
+        # enemy1
+        player = self.player.sprite
+        player_pos = (player.rect.x, player.rect.y)
+        #print(player_pos)
+        self.enemy.update(self.world_shift_x,player_pos,player)
+        self.enemy_horizontal_movement_collision()
+        self.enemy_vertical_movement_collision()
+        self.enemy.draw(self.display_surface)
 
