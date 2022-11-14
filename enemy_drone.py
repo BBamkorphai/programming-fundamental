@@ -3,7 +3,7 @@ import time
 from support import import_folder
 
 
-class Enemy(pygame.sprite.Sprite):
+class Enemy_drone(pygame.sprite.Sprite):
     def __init__(self,pos,surface): 
         super().__init__()
         # level setup
@@ -27,13 +27,13 @@ class Enemy(pygame.sprite.Sprite):
         self.import_character_assets()
         self.frame_index = 0
         self.animation_speed = 0.2
-        self.image = self.animations['Walk'][self.frame_index]
+        self.image = self.animations['fly'][self.frame_index]
         self.rect = self.image.get_rect(topleft = pos)
 
         
 
         # enemy status
-        self.status = 'Death'
+        self.status = 'death'
         self.facing_right = True
         self.on_ground = False
         self.on_ceiling = False
@@ -51,8 +51,8 @@ class Enemy(pygame.sprite.Sprite):
         
 
     def import_character_assets(self):
-        character_path = 'D:\\platfrom testing\\graphics\\enemy_1\\'
-        self.animations = {'Attack':[],'Death':[],'Hurt':[],'Walk':[],'permanant_death':[]}
+        character_path = 'D:/platfrom testing/graphics/enemy_2/'
+        self.animations = {'fly':[],'death':[],'permanent_death':[],'attack':[]}
 
         for animation in self.animations.keys():
             full_path = character_path + animation
@@ -60,6 +60,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def animate(self):
         animation = self.animations[self.status]
+        
 
         # loop over forframe index
         self.frame_index += self.animation_speed
@@ -87,18 +88,37 @@ class Enemy(pygame.sprite.Sprite):
         elif self.on_ceiling:
             self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
+    def get_player_distance_direction(self,player):
+        enemy_vec = pygame.math.Vector2(self.rect.center)
+        player_vec = pygame.math.Vector2(player.rect.center)
+        #convert vector to distance
+        distance = (player_vec - enemy_vec).magnitude() 
+        #print(distance)
+        if distance > 0:
+            direction = (player_vec - enemy_vec).normalize()
+        else:
+            direction = pygame.math.Vector2()
+        
+        #print(direction)
+
+        return (distance, direction)
 
     def get_enemy_status(self,player_pos,player,UI):
+        direction = self.get_player_distance_direction(player)[1]
+        #print(direction)
+        direction_x = direction[0]
+        direction_y = direction[1]
         self.rect.x += self.direction.x * self.speed
+        self.rect.y += self.direction.y * self.speed
         if self.direction.y >= 1000:
-            self.status = 'permanant_death'
-            #print("enemy out of frame")
-        if player.rect.colliderect(self.rect) and self.status != 'permanant_death' and self.status != 'Death':
+            self.status = 'permanent_death'
+            print("one of the enemy out of frame")
+        if player.rect.colliderect(self.rect) and self.status != 'permanent_death' and self.status != 'death':
             if self.direction.x < 0 and player.direction.x <= 0 :
                 if time.time() - self.hitted_time >= self.delay_hit:
                     self.hitted_time = time.time()
                     player.get_damage(200)
-                    self.status = 'Attack'
+                    self.status = 'attack'
                 self.on_left = True
                 self.facing_right = True
                 self.current_x = self.rect.left
@@ -108,7 +128,7 @@ class Enemy(pygame.sprite.Sprite):
                 if time.time() - self.hitted_time >= self.delay_hit:
                     self.hitted_time = time.time()
                     player.get_damage(200)
-                    self.status = 'Attack'
+                    self.status = 'attack'
                 self.on_right = True
                 self.facing_right = False
                 self.current_x = self.rect.right
@@ -118,7 +138,7 @@ class Enemy(pygame.sprite.Sprite):
                 if time.time() - self.hitted_time >= self.delay_hit:
                     self.hitted_time = time.time()
                     player.get_damage(200)
-                    self.status = 'Attack'
+                    self.status = 'attack'
                 self.on_right = True
                 self.facing_right = False
                 self.current_x = self.rect.right
@@ -127,48 +147,73 @@ class Enemy(pygame.sprite.Sprite):
                 if time.time() - self.hitted_time >= self.delay_hit:
                     self.hitted_time = time.time()
                     player.get_damage(200)
-                    self.status = 'Attack'
+                    self.status = 'attack'
                 self.on_right = True
                 self.facing_right = True
                 self.current_x = self.rect.right
 
 
-        elif self.enemy_health <= 0 and self.status != 'permanant_death' and self.status != 'Death':
+        elif self.enemy_health <= 0 and self.status != 'permanent_death' and self.status != 'death':
                 self.direction.x = 0
                 self.direction.y = 0
-                self.status = 'Death'
-                UI.get_score(500)
-                self.current_time = time.time()
-                print("death")
+                self.status = 'death'
+                UI.get_score(200)
                 
+                self.current_time = time.time()
+                #print("death")
 
-        elif self.enemy_damaged > 0  and self.status != 'permanant_death' and self.status != 'Death' :
-            self.status = 'Hurt'
+        elif self.enemy_damaged > 0  and self.status != 'permanent_death' and self.status != 'death' :
             self.enemy_damaged = 0
             #print("hurt")
 
-        elif self.status != 'permanant_death' and self.status != 'Death':
-            if self.facing_right == False:
-                self.status = 'Walk'
-                self.direction.x = -0.5
-            else:
-                self.status = 'Walk'
+        elif self.status != 'permanent_death' and self.status != 'death':
+            #print(direction_y)
+            #0.007
+            #-0.007
+            if direction_x >= 0:
                 self.direction.x = 0.5
+                self.status = 'fly'
+                self.facing_right = True
+            elif direction_x < -0:
+                self.direction.x = -0.5
+                self.status = 'fly'
+                self.facing_right = False
+            else:
+                self.direction.x = 0
+                self.status = 'fly'
 
-        if time.time() - self.current_time >= self.delay_death and self.status == 'Death':
-            self.status = 'permanant_death'
-            #print("permanant_death")
+            if direction_y >= 0:
+                self.direction.y = 0.5
+                self.status = 'fly'
+            elif direction_y < 0:
+                self.direction.y = -0.5
+                self.status = 'fly'
+            else:
+                self.direction.y = 0
+                self.status = 'fly'
+
+
+        #distance = self.get_player_distance_direction(player)[0]
+
+        #if distance <= self.attack_radius and self.can_attack:
+            #if self.status != 'attack':
+                #self.frame_index = 0
+            #self.status = 'attack'
+        #elif distance <= self.notice_radius:
+            #self.status = 'move'
+        #else:
+            #self.status = 'idle'
+
+        if time.time() - self.current_time >= self.delay_death and self.status == 'death':
+            self.status = 'permanent_death'
+            #print("permanent_death")
             self.current_time = time.time()
         
-        # ตายห่าตลอดกาล ๒ # แก้ได้แล้วหว่ะครับ
+        
 
     #def enemy_killed(self,score):
         #if self.status == 'Death':
             #score += 500
-
-    def apply_gravity(self):
-        self.direction.y += self.gravity
-        self.rect.y += self.direction.y
         
     def spawn_shift(self,x_shift):
         self.rect.x += x_shift
@@ -178,7 +223,7 @@ class Enemy(pygame.sprite.Sprite):
         self.set_rect_position(pos)
         #self.spawn_shift(x_shift)
         self.enemy_health = 100
-        self.status = 'Walk'
+        self.status = 'fly'
         self.enemy_damaged = 0
         #print("respawn")
         

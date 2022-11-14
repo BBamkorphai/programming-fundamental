@@ -1,4 +1,4 @@
-from turtle import position
+#from turtle import position
 import pygame 
 
 class Tile(pygame.sprite.Sprite):

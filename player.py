@@ -1,4 +1,5 @@
 import pygame
+import time
 from support import import_folder
 screen = pygame.display.set_mode((800,800))
 
@@ -15,8 +16,8 @@ class Player(pygame.sprite.Sprite):
         self.player_pos = pos
 
         #health bar
-        self.current_health = 200
-        self.target_health = 500
+        self.current_health = 1000
+        self.target_health = 1000
         self.max_health = 1000
         self.health_bar_length = 400
         self.health_ratio = self.max_health / self.health_bar_length
@@ -42,6 +43,11 @@ class Player(pygame.sprite.Sprite):
         self.on_ceiling = False
         self.on_left = False
         self.on_right = False
+
+        # time
+        self.current_time = 0
+        self.last_shoot = 0
+        self.shoot_delay = 0.25
 
 
     def get_damage(self,amount):
@@ -153,13 +159,26 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if keys[pygame.K_UP] and self.on_ground:
             self.jump()
             self.create_jump_particles(self.rect.midbottom)
         if keys[pygame.K_h]:
             self.get_health(200)
         if keys[pygame.K_d]:
             self.get_damage(200)
+
+    def firer(self):
+        keys_pre = pygame.key.get_pressed()
+        if keys_pre[pygame.K_SPACE] and time.time() - self.current_time >= self.shoot_delay:
+            self.current_time = time.time()
+            # print("pressed")
+            # bullet.active = True
+            # ยิงกระสุน
+            return True
+        #keys_post = pygame.KEYUP
+        #if keys_post[pygame.K_SPACE]:
+            #return False
+        return False
 
     def get_status(self):
         if self.direction.y < 0:

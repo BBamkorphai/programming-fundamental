@@ -1,6 +1,6 @@
 import pygame
 
-class UI:
+class UI_class:
     def __init__(self,surface):
 
         # setup
@@ -13,7 +13,7 @@ class UI:
         self.UI_ammo_pos = (10,85)
 
         # shoot
-        self.number_of_shoot = 100
+        self.number_of_shoot = 10
 
         # font
         self.over_font = pygame.font.Font('freesansbold.ttf', 32)
@@ -26,6 +26,14 @@ class UI:
 
         # score_pos
         self.score_pos = (1100,55)
+
+        
+
+    def get_score(self,amount):
+        #print("get score")
+        #print(amount)
+        self.score += amount
+        #print(self.score)
 
     def show_ammo(self):
         self.display_surface.blit(self.ammo,self.UI_ammo_pos)
@@ -47,4 +55,3 @@ class UI:
         self.show_ammo()
         self.show_num_shot()
         self.show_score()
-    

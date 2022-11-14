@@ -4,13 +4,14 @@ from tiles import Tile
 from level import Level
 from player import Player
 from UI import *
+from bullet import *
 #py gmae set up
 pygame.init()
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock = pygame.time.Clock()
 level = Level(level_map,screen)
-ui = UI(screen)
-
+ui = UI_class (screen)
+pygame.display.set_caption('...')
 
 while True:
     for event in pygame.event.get():
@@ -23,6 +24,5 @@ while True:
     screen.blit(BG, (0,0))
     level.run()
     ui.UI_RUN()
-    
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(60)  
