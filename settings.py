@@ -7,7 +7,7 @@ level_map = [
 ' X                                                            X',
 ' X                         A                                  XD',
 'DX                         AC                                 X',
-' X     M         E     M   ABC                                X',
+' X     M      H  E     M   ABC                                X',
 ' X     ABBBBBBBBBBBBBBBC   ABBC                               X',
 ' X                         ABBBC                              X',
 ' X                                                            X',
@@ -15,12 +15,12 @@ level_map = [
 ' X                                  M                         X',
 ' X                                  ABBBBBBBBBBBBBBBBBBBBBBBBCX',
 'DX                E         E                                 X',
-' X      M                        M                            XD',
+' X      M             H          M                            XD',
 ' XQ     ABBBBBBBBBBBBBBBBBBBBBBBBC                            X',
 ' XQQ                                                          X',
 ' XQQQ                                                         X',
 ' XQQQQ                  E                           E         X',
-' XQQQQQ       P                                               X',
+' XQQQQQ       P                      H                        X',
 ' XGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGX']
 
 tile_size = 32

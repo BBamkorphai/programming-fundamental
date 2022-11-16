@@ -51,7 +51,7 @@ class Enemy_drone(pygame.sprite.Sprite):
         
 
     def import_character_assets(self):
-        character_path = 'D:/platfrom testing/graphics/enemy_2/'
+        character_path = 'D:/survive! if you can/graphics/enemy_2/'
         self.animations = {'fly':[],'death':[],'permanent_death':[],'attack':[]}
 
         for animation in self.animations.keys():
@@ -112,7 +112,7 @@ class Enemy_drone(pygame.sprite.Sprite):
         self.rect.y += self.direction.y * self.speed
         if self.direction.y >= 1000:
             self.status = 'permanent_death'
-            print("one of the enemy out of frame")
+            #print("one of the enemy out of frame")
         if player.rect.colliderect(self.rect) and self.status != 'permanent_death' and self.status != 'death':
             if self.direction.x < 0 and player.direction.x <= 0 :
                 if time.time() - self.hitted_time >= self.delay_hit:
@@ -157,7 +157,7 @@ class Enemy_drone(pygame.sprite.Sprite):
                 self.direction.x = 0
                 self.direction.y = 0
                 self.status = 'death'
-                UI.get_score(200)
+                UI.get_score(1000)
                 
                 self.current_time = time.time()
                 #print("death")
@@ -222,7 +222,7 @@ class Enemy_drone(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(0,0)
         self.set_rect_position(pos)
         #self.spawn_shift(x_shift)
-        self.enemy_health = 100
+        self.enemy_health = 50
         self.status = 'fly'
         self.enemy_damaged = 0
         #print("respawn")

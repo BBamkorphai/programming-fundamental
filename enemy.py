@@ -51,7 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         
 
     def import_character_assets(self):
-        character_path = 'D:\\platfrom testing\\graphics\\enemy_1\\'
+        character_path = 'D:\\survive! if you can\\graphics\\enemy_1\\'
         self.animations = {'Attack':[],'Death':[],'Hurt':[],'Walk':[],'permanant_death':[]}
 
         for animation in self.animations.keys():
@@ -139,7 +139,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.status = 'Death'
                 UI.get_score(500)
                 self.current_time = time.time()
-                print("death")
+                #print("death")
                 
 
         elif self.enemy_damaged > 0  and self.status != 'permanant_death' and self.status != 'Death' :
@@ -177,7 +177,7 @@ class Enemy(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(0,0)
         self.set_rect_position(pos)
         #self.spawn_shift(x_shift)
-        self.enemy_health = 100
+        self.enemy_health = 75
         self.status = 'Walk'
         self.enemy_damaged = 0
         #print("respawn")

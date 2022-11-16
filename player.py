@@ -48,6 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.current_time = 0
         self.last_shoot = 0
         self.shoot_delay = 0.25
+        
 
 
     def get_damage(self,amount):
@@ -92,15 +93,15 @@ class Player(pygame.sprite.Sprite):
 
 
     def import_character_assets(self):
-        character_path = 'D:\\platfrom testing\\graphics\\character\\'
-        self.animations = {'idel':[],'walk':[],'jump':[],'fall':[]}
+        character_path = 'D:\\survive! if you can\\graphics\\character\\'
+        self.animations = {'idel':[],'walk':[],'jump':[],'fall':[],'death':[]}
 
         for animation in self.animations.keys():
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
     
     def import_dust_run_particles(self):
-        self.dust_run_particles = import_folder('D:\\platfrom testing\\graphics\\character\\dust_particles\\run')
+        self.dust_run_particles = import_folder('D:\\survive! if you can\\graphics\\character\\dust_particles\\run')
 
     def animate(self):
         animation = self.animations[self.status]
@@ -150,16 +151,16 @@ class Player(pygame.sprite.Sprite):
     def get_input(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and self.status != 'death':
             self.direction.x = 1
             self.facing_right = True
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] and self.status != 'death':
             self.direction.x = -1
             self.facing_right = False
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_UP] and self.on_ground:
+        if keys[pygame.K_UP] and self.on_ground and self.status != 'death':
             self.jump()
             self.create_jump_particles(self.rect.midbottom)
         if keys[pygame.K_h]:
@@ -169,7 +170,7 @@ class Player(pygame.sprite.Sprite):
 
     def firer(self):
         keys_pre = pygame.key.get_pressed()
-        if keys_pre[pygame.K_SPACE] and time.time() - self.current_time >= self.shoot_delay:
+        if keys_pre[pygame.K_SPACE] and time.time() - self.current_time >= self.shoot_delay and self.status != 'death':
             self.current_time = time.time()
             # print("pressed")
             # bullet.active = True
@@ -190,6 +191,9 @@ class Player(pygame.sprite.Sprite):
                 self.status = 'walk'
             elif self.on_ground:
                 self.status = 'idel'
+
+        if self.current_health <= 0:
+            self.status = 'death'
 
     def apply_gravity(self):
         self.direction.y += self.gravity

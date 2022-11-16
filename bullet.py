@@ -16,7 +16,7 @@ class Bullet(pygame.sprite.Sprite):
         
         self.facing_right = True
 
-        self.image = pygame.image.load("D:\\platfrom testing\\graphics\\bullet\\5.png")
+        self.image = pygame.image.load("D:\\survive! if you can\\graphics\\bullet\\5.png")
         self.rect = self.image.get_rect(topleft = pos)
 
         self.active = False
@@ -33,16 +33,20 @@ class Bullet(pygame.sprite.Sprite):
 
     def set_rect_position(self,pos):
         self.rect = self.image.get_rect(topleft = pos)
+        #print("set rect bullet pass")
         
     
     def bullet_move(self):
+        #print("bullet move pass")
         if self.facing_right == True:
             self.bullet_direction.x = 1
         else:
             self.bullet_direction.x = -1
         self.rect.x += self.bullet_direction.x * self.speed
 
-    def update(self,x_shift):
 
+
+    def update(self,x_shift):
+        #print("pass")
         self.bullet_move()
         self.rect.x += x_shift
